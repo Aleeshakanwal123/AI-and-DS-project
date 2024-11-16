@@ -29,7 +29,7 @@ def predict(new_data):
 # Main execution
 if __name__ == "__main__":
     # Example workflow
-    data_file = "your_dataset.csv"  # Replace with your file
+    data_file = "TestReviews.csv"  # Replace with your file
     X, y = load_data(data_file)
 
     # Train and save the model
