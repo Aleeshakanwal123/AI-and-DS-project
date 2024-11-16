@@ -8,11 +8,6 @@ import streamlit as st
 # Load the dataset
 dataset_path = 'TestReviews.csv'
 
-    # Display dataset preview in Streamlit
-    st.write("Dataset preview:")
-    st.write(data.head())
-
-    # Preprocessing
     X = data['text']  # assuming the review text is in a column named 'text'
     y = data['label']  # assuming the sentiment labels are in a column named 'label'
 
