@@ -8,48 +8,6 @@ from sklearn.pipeline import make_pipeline
 from sklearn.metrics import accuracy_score
 import joblib  # To save/load models
 
-# Download NLTK resources
-nltk.download('stopwords')
-nltk.download('punkt')
-
-# Function to train a text classification model
-def train_model(df):
-    # Extract features (text) and labels (target)
-    X = df['text']
-    y = df['label']
-    
-    # Split into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Create a pipeline: vectorizer + Naive Bayes model
-    model = make_pipeline(CountVectorizer(stop_words='english'), MultinomialNB())
-    
-    # Train the model
-    model.fit(X_train, y_train)
-    
-    # Make predictions on the test set
-    y_pred = model.predict(X_test)
-    
-    # Show accuracy
-    accuracy = accuracy_score(y_test, y_pred)
-    st.write(f"Model Accuracy: {accuracy:.2f}")
-    
-    # Save the trained model for later use
-    joblib.dump(model, 'model.pkl')
-    st.write("Model saved successfully.")
-
-    return model
-
-# Function to load a pre-trained model
-def load_model():
-    try:
-        model = joblib.load('model.pkl')
-        st.write("Model loaded successfully.")
-        return model
-    except FileNotFoundError:
-        st.write("No pre-trained model found. Please train a model first.")
-        return None
-
 # Streamlit app interface
 st.title("Text Prediction App")
 
