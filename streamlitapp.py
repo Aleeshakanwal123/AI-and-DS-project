@@ -19,14 +19,6 @@ if uploaded_file is not None:
     st.write("Dataset Preview:")
     st.write(df.head())
     
-    # Check for required columns
-    if 'text' in df.columns and 'label' in df.columns:
-        # Train model on uploaded data
-        model = train_model(df)
-        
-    else:
-        st.error("Dataset must contain 'text' and 'label' columns.")
-
 # Prediction section
 st.subheader("Make Predictions")
 model = load_model()  # Load the model (or None if not trained)
