@@ -35,7 +35,4 @@ if __name__ == "__main__":
     # Train and save the model
     train_model(X, y)
 
-    # Load new data for prediction
-    new_data = pd.DataFrame([[5.1, 3.5, 1.4, 0.2]])  # Replace with real data
-    predictions = predict(new_data)
-    print("Predictions:", predictions)
+    
