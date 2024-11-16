@@ -8,11 +8,6 @@ import streamlit as st
 # Load the dataset
 dataset_path = 'TestReviews.csv'
 
-if not os.path.exists(dataset_path):
-    st.error(f"Dataset file {dataset_path} not found!")
-else:
-    data = pd.read_csv(dataset_path)
-
     # Display dataset preview in Streamlit
     st.write("Dataset preview:")
     st.write(data.head())
