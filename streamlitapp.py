@@ -1,31 +1,38 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.ensemble import RandomForestClassifier
-import joblib
 import streamlit as st
+import joblib
+import numpy as np
 
-# Load the dataset
-dataset_path = 'TestReviews.csv'
+# Load the trained model and vectorizer
+model = joblib.load('sentiment_model.pkl')
+vectorizer = joblib.load('vectorizer.pkl')
 
-    X = data['text']  # assuming the review text is in a column named 'text'
-    y = data['label']  # assuming the sentiment labels are in a column named 'label'
+# Streamlit page configuration
+st.set_page_config(page_title="Sentiment Analysis App", layout="centered")
 
-    # Split data into training and testing datasets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Add a title and description
+st.title("Sentiment Analysis of Product Reviews")
+st.markdown("Enter a product review, and the model will predict whether the sentiment is positive, negative, or neutral.")
 
-    # Vectorize the text data
-    vectorizer = TfidfVectorizer(max_features=5000)
-    X_train_vect = vectorizer.fit_transform(X_train)
-    X_test_vect = vectorizer.transform(X_test)
+# Create a text input box for the user to enter a review
+review_text = st.text_area("Enter Review Text", height=150)
 
-    # Train the model
-    model = RandomForestClassifier(n_estimators=100)
-    model.fit(X_train_vect, y_train)
+# Define the action when the button is pressed
+if st.button("Predict Sentiment"):
+    if review_text:
+        # Vectorize the input review text
+        vect = vectorizer.transform([review_text])
 
-    # Save model and vectorizer for future use
-    joblib.dump(model, 'model.pkl')
-    joblib.dump(vectorizer, 'vectorizer.pkl')
+        # Predict the sentiment using the model
+        prediction = model.predict(vect)
 
-    # Display success message
-    st.success("Model trained and saved successfully!")
+        # Show the predicted sentiment
+        if prediction[0] == 1:
+            sentiment = "Positive"
+        elif prediction[0] == 0:
+            sentiment = "Negative"
+        else:
+            sentiment = "Neutral"
+
+        st.write(f"The sentiment of the review is: **{sentiment}**")
+    else:
+        st.warning("Please enter some text to analyze.")
