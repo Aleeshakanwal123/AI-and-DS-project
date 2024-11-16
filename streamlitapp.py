@@ -3,8 +3,8 @@ import joblib
 import numpy as np
 
 # Load the model and vectorizer
-model = joblib.load('model.pkl')
-vectorizer = joblib.load('vectorizer.pkl')
+model = joblib.load('TestReviews.csv')
+vectorizer = joblib.load('TestReviews.csv')
 
 # Streamlit page configuration
 st.set_page_config(page_title="Sentiment Analysis App", layout="centered")
