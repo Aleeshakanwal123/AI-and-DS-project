@@ -1,38 +1,53 @@
 import streamlit as st
-import joblib
-import numpy as np
+import pandas as pd
+import nltk
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+from sklearn.feature_extraction.text import CountVectorizer
 
-# Load the trained model and vectorizer
-model = joblib.load('sentiment_model.pkl')
-vectorizer = joblib.load('vectorizer.pkl')
+# Download NLTK data (if necessary)
+nltk.download('stopwords')
+nltk.download('punkt')
 
-# Streamlit page configuration
-st.set_page_config(page_title="Sentiment Analysis App", layout="centered")
+# Function to create a word cloud from text
+def generate_wordcloud(text):
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+    plt.figure(figsize=(10, 5))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    st.pyplot(plt)
 
-# Add a title and description
-st.title("Sentiment Analysis of Product Reviews")
-st.markdown("Enter a product review, and the model will predict whether the sentiment is positive, negative, or neutral.")
+# Streamlit app
+st.title("Textual Data Analysis with Streamlit")
 
-# Create a text input box for the user to enter a review
-review_text = st.text_area("Enter Review Text", height=150)
-
-# Define the action when the button is pressed
-if st.button("Predict Sentiment"):
-    if review_text:
-        # Vectorize the input review text
-        vect = vectorizer.transform([review_text])
-
-        # Predict the sentiment using the model
-        prediction = model.predict(vect)
-
-        # Show the predicted sentiment
-        if prediction[0] == 1:
-            sentiment = "Positive"
-        elif prediction[0] == 0:
-            sentiment = "Negative"
-        else:
-            sentiment = "Neutral"
-
-        st.write(f"The sentiment of the review is: **{sentiment}**")
+# Upload file (or load predefined dataset)
+uploaded_file = st.file_uploader("Upload your CSV file", type="csv")
+if uploaded_file is not None:
+    # Read the CSV file into a pandas DataFrame
+    df = pd.read_csv(uploaded_file)
+    
+    # Show the first few rows of the dataset
+    st.write("Dataset Preview:")
+    st.write(df.head())
+    
+    # Assume there is a 'text' column in the dataset containing textual data
+    if 'text' in df.columns:
+        # Text preprocessing: Remove NaN and combine text into one string
+        text_data = df['text'].dropna().str.cat(sep=' ')
+        
+        # Display word cloud
+        st.subheader("Word Cloud of Text Data")
+        generate_wordcloud(text_data)
+        
+        # Show most frequent words using CountVectorizer
+        vectorizer = CountVectorizer(stop_words='english', max_features=10)
+        word_count = vectorizer.fit_transform(df['text'].dropna())
+        word_freq = pd.DataFrame(word_count.toarray(), columns=vectorizer.get_feature_names_out()).sum(axis=0).sort_values(ascending=False)
+        
+        st.subheader("Top 10 Frequent Words")
+        st.bar_chart(word_freq.head(10))
+        
     else:
-        st.warning("Please enter some text to analyze.")
+        st.error("No 'text' column found in the dataset.")
+
+           
