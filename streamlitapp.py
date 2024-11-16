@@ -1,50 +1,41 @@
-import streamlit as st
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.ensemble import RandomForestClassifier
 import joblib
-import numpy as np
+import streamlit as st
 
-# Load the model and vectorizer
-model = joblib.load('TestReviews.csv')
-vectorizer = joblib.load('TestReviews.csv')
+# Load the dataset
+dataset_path = 'TestReviews.csv'
 
-# Streamlit page configuration
-st.set_page_config(page_title="Sentiment Analysis App", layout="centered")
+if not os.path.exists(dataset_path):
+    st.error(f"Dataset file {dataset_path} not found!")
+else:
+    data = pd.read_csv(dataset_path)
 
-# Add a title and description to the app
-st.title("Sentiment Analysis on Reviews")
-st.markdown("Enter a review text, and the model will predict its sentiment (positive or negative).")
+    # Display dataset preview in Streamlit
+    st.write("Dataset preview:")
+    st.write(data.head())
 
-# Create a text input box for the user to enter a review
-review_text = st.text_area("Enter Review Text", height=150)
+    # Preprocessing
+    X = data['text']  # assuming the review text is in a column named 'text'
+    y = data['label']  # assuming the sentiment labels are in a column named 'label'
 
-# Define the action when the button is pressed
-if st.button("Predict Sentiment"):
-    if review_text:
-        # Vectorize the input review text
-        vect = vectorizer.transform([review_text])
+    # Split data into training and testing datasets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        # Predict the sentiment using the model
-        prediction = model.predict(vect)
+    # Vectorize the text data
+    vectorizer = TfidfVectorizer(max_features=5000)
+    X_train_vect = vectorizer.fit_transform(X_train)
+    X_test_vect = vectorizer.transform(X_test)
 
-        # Display the prediction result
-        if prediction[0] == 1:
-            sentiment = "Positive"
-        else:
-            sentiment = "Negative"
+    # Train the model
+    model = RandomForestClassifier(n_estimators=100)
+    model.fit(X_train_vect, y_train)
 
-        # Show the predicted sentiment
-        st.write(f"The sentiment of the review is: **{sentiment}**")
-    else:
-        st.warning("Please enter some text to analyze.")
+    # Save model and vectorizer for future use
+    joblib.dump(model, 'model.pkl')
+    joblib.dump(vectorizer, 'vectorizer.pkl')
 
-
-        import streamlit as st
-import pickle
-
-# Load model
-model = pickle.load(open("model.pkl", "rb"))
-
-st.title("Spam Classifier")
-user_input = st.text_input("Enter text:")
-if user_input:
-    prediction = model.predict([user_input])
-    st.write(f"Prediction: {'Spam' if prediction[0] else 'Not Spam'}")
+    # Display success message
+    st.success("Model trained and saved successfully!")
