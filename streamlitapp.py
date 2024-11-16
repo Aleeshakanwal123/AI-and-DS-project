@@ -35,3 +35,16 @@ if st.button("Predict Sentiment"):
         st.write(f"The sentiment of the review is: **{sentiment}**")
     else:
         st.warning("Please enter some text to analyze.")
+
+
+        import streamlit as st
+import pickle
+
+# Load model
+model = pickle.load(open("model.pkl", "rb"))
+
+st.title("Spam Classifier")
+user_input = st.text_input("Enter text:")
+if user_input:
+    prediction = model.predict([user_input])
+    st.write(f"Prediction: {'Spam' if prediction[0] else 'Not Spam'}")
